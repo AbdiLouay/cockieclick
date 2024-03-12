@@ -10,7 +10,7 @@ const connection = mysql.createConnection({
 host: '192.168.65.77', // L'hôte de la base de données
 user: 'api', // Votre nom d'utilisateur MySQL
 password: 'api', // Votre mot de passe MySQL
-database: 'exo2' // Le nom de votre base de données
+database: 'cokieclic' // Le nom de votre base de données
 });
 
  // Connexion à la base de données
@@ -27,13 +27,7 @@ app.use(cors());
             
 // Configuration d'une route pour la racine "/"
 app.get('/', (req, res) => {
-/*let temp =  Math.floor(Math.random() * (36 - (-10) + 1)) + (-10);
-const response = {
-      temperature: temp,
-      unit: '°C'
-};
-            
-res.json(response);*/
+
 
 
 app.post('/addUser', (req, res) => {
