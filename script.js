@@ -5,7 +5,7 @@ document.getElementById('login-form').addEventListener('submit', function(event)
     var password = document.getElementById('password').value;
 
     
-    fetch('http://example.com/api/login', {
+    fetch('http://192.168.65.77:3000/api/login', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
