@@ -1,49 +1,86 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const mysql = require('mysql');
-
 const app = express();
+const mysql = require('mysql');
+const cors = require('cors');
 const port = 3000;
 
-app.use(bodyParser.json());
+app.use(express.json());
 
-// Configuration de la connexion à la base de données
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'votre_utilisateur_mysql',
-    password: 'votre_mot_de_passe_mysql',
-    database: 'nom_de_votre_base_de_données'
+host: '192.168.65.77', // L'hôte de la base de données
+user: 'api', // Votre nom d'utilisateur MySQL
+password: 'api', // Votre mot de passe MySQL
+database: 'exo2' // Le nom de votre base de données
 });
 
-// Connexion à la base de données
-connection.connect((err) => {
-    if (err) {
-        console.error('Erreur de connexion à la base de données :', err);
-        return;
-    }
-    console.log('Connexion à la base de données réussie');
-});
-
-app.post('/api/login', (req, res) => {
-    const { username, password } = req.body;
-
-    // Requête SQL pour vérifier les informations d'identification
-    const sql = `SELECT * FROM users WHERE username = ? AND password = ?`;
-    connection.query(sql, [username, password], (err, results) => {
+ // Connexion à la base de données
+        connection.connect((err) => {
         if (err) {
-            console.error('Erreur lors de l\'exécution de la requête SQL :', err);
-            res.status(500).json({ error: 'Internal server error' });
-            return;
+            console.error('Erreur de connexion à la base de données :', err);
+            throw err;
         }
+        console.log('Connecté à la base de données MySQL');
+        });
+            
 
-        if (results.length > 0) {
-            res.status(200).json({ message: 'Login successful!' });
-        } else {
-            res.status(401).json({ error: 'Invalid username or password.' });
-        }
-    });
+app.use(cors());
+            
+// Configuration d'une route pour la racine "/"
+app.get('/', (req, res) => {
+/*let temp =  Math.floor(Math.random() * (36 - (-10) + 1)) + (-10);
+const response = {
+      temperature: temp,
+      unit: '°C'
+};
+            
+res.json(response);*/
+
+
+app.post('/addUser', (req, res) => {
+
+  const { nom, prenom } = req.body;
+
+  if (!nom || !prenom) {
+    return res.status(400).json({ message: 'nom et prenom requis' });
+
+  }
+
+  // Requête d'insertion
+  const sql = 'INSERT INTO User (nom, prenom) VALUES (?, ?)';
+
+  // Exécute la requête
+  connection.query(sql, [nom, prenom], (err, results) => {
+    if (err) {
+      console.error('Erreur lors de l\'exécution de la requête d\'insertion :', err);
+      res.status(500).send('Erreur lors de l\'insertion des données');
+      return;
+    }
+
+    //je rajoute au json une cles success à true que j'utilise dans le front
+    //cette clé me permetra de vérifier que l'api s'est bien déroulé
+    req.body.success = true;
+    res.json(req.body);
+  });
+
+
 });
 
+
+connection.query('SELECT * FROM User', (err, results) => {
+    if (err) {
+      console.error('Erreur lors de l\'exécution de la requête :', err);
+      res.status(500).send('Erreur lors de la requête SQL');
+      return;
+    }
+
+    // Envoi des résultats en tant que réponse JSON
+    res.json(results);
+  });
+
+
+});
+
+// Écoute du serveur sur le port spécifié
 app.listen(port, () => {
-    console.log(`Le serveur est en cours d'exécution sur http://localhost:${port}`);
+   console.log(`Serveur Express en cours d'exécution sur le port ${port}`);
 });
