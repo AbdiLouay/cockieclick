@@ -7,12 +7,19 @@ const port = 3000;
 
 app.use(bodyParser.json());
 
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://192.168.65.77');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    next();
+});
+
 // Configuration de la connexion à la base de données
 const connection = mysql.createConnection({
     host: '192.168.65.77', // L'hôte de la base de données
     user: 'api', // Votre nom d'utilisateur MySQL
     password: 'api', // Votre mot de passe MySQL
-    database: 'cokieclic' // Le nom de votre base de données
+    database: 'cookieclic' // Le nom de votre base de données
 });
 
 // Connexion à la base de données
@@ -28,21 +35,21 @@ app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
 
     // Requête SQL pour vérifier les informations d'identification
-    const sql = `SELECT * FROM users WHERE username = ? AND password = ?`;
+    const sql = `SELECT * FROM User WHERE nom = ? AND prenom = ?`;
     connection.query(sql, [username, password], (err, results) => {
         if (err) {
             console.error('Erreur lors de l\'exécution de la requête SQL :', err);
-            res.status(500).json({ error: 'Internal server error' });
-            return;
+            return res.status(500).json({ error: 'Erreur interne du serveur' });
         }
 
         if (results.length > 0) {
-            res.status(200).json({ message: 'Login successful!' });
+            res.status(200).json({ message: 'Connexion réussie!' });
         } else {
-            res.status(401).json({ error: 'Invalid username or password.' });
+            res.status(401).json({ error: 'Nom d\'utilisateur ou mot de passe invalide.' });
         }
     });
 });
+
 
 app.listen(port, () => {
     console.log(`Le serveur est en cours d'exécution sur http://localhost:${port}`);
