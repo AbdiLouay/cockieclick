@@ -1,20 +1,24 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mysql = require('mysql');
+const cors = require('cors');
 const cookieParser = require('cookie-parser');
 
+const path = require('path')
 const app = express();
 const port = 3000;
 
 app.use(bodyParser.json());
 app.use(cookieParser());
 
+app.use(express.static(path.join(__dirname, 'front')));
 app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', 'http://192.168.65.77');
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     next();
 });
+app.use(cors());
 
 // Configuration de la connexion à la base de données
 const connection = mysql.createConnection({
@@ -48,9 +52,10 @@ app.post('/api/login', (req, res) => {
         if (results.length > 0) {
             const cookieOptions = {
                 maxAge: 7 * 24 * 60 * 60 * 1000, // Durée de validité du cookie en millisecondes (7 jours)
-                httpOnly: true, // Le cookie n'est pas accessible via JavaScript côté client
+                httpOnly: false, // Le cookie n'est pas accessible via JavaScript côté client
+                sameSite: 'None'
             };
-            
+            console.log('Connexion d\'un client mise en place du cookie');
             // Set the cookie manually
             res.cookie('userInfo', { nom: nom, motDePasse: motDePasse }, cookieOptions);
 
@@ -62,6 +67,8 @@ app.post('/api/login', (req, res) => {
 });
 
 
+
 app.listen(port, () => {
     console.log(`Le serveur est en cours d'exécution sur http://localhost:${port}`);
 });
+
