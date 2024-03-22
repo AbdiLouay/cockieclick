@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,15 +9,22 @@
 <body>
     <div class="login-container">
         <h2>Login</h2>
-        <form id="login-form">
-            <input type="text" id="nom" placeholder="Nom" required> <!-- Utilisez "Nom" pour le champ de nom -->
-            <input type="password" id="mot-de-passe" placeholder="Mot de passe" required> <!-- Utilisez "Mot de passe" pour le champ de mot de passe -->
-            <button type="submit">Login</button>
-        </form>
+        <div id="login-form">
+            <input type="text" id="nom" placeholder="Nom" required value=""> <!-- Utilisez "Nom" pour le champ de nom -->
+            <input type="password" id="mot-de-passe" placeholder="Mot de passe" required required value=""> <!-- Utilisez "Mot de passe" pour le champ de mot de passe -->
+            <button id="login-button">Login</button>
+            <div style="width: 10px; display: inline-block;"></div> <!-- Espace de 20 pixels -->
+            <button onclick="window.location.href = 'inscription.html';">S'inscrire</button>
+        </div>
+        
+        <div id="login-success" style="display: none;">
+            <h2>Login réussi !</h2>
+            <!-- Ajoutez ici le contenu de la page qui sera affiché après la connexion réussie -->
+        </div>
+       
         <p id="error-message" class="error-message"></p>
     </div>
-
-    <script src="script.js"></script>
+    
+    <script src="script.js"></script> <!-- Inclure le fichier JavaScript -->
 </body>
 </html>
-
