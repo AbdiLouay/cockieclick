@@ -53,3 +53,22 @@ button:hover {
     margin-top: 10px;
 }
 
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Hauteur égale à 100% de la hauteur de la fenêtre */
+}
+
+.clickable-image {
+    max-width: 300px; /* Limite la largeur de l'image à 300 pixels */
+    max-height: 200px; /* Limite la hauteur de l'image à 200 pixels */
+    width: auto; /* La largeur de l'image s'ajuste automatiquement pour préserver les proportions */
+    height: auto; /* La hauteur de l'image s'ajuste automatiquement pour préserver les proportions */
+    display: block; /* Assurez-vous que l'image est affichée en tant que bloc pour éviter des problèmes de mise en page */
+    margin: 0 auto; /* Centrer l'image horizontalement */
+}
+
+#score-increment-button {
+    cursor: pointer;
+}

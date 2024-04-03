@@ -4,7 +4,7 @@ document.getElementById('inscription-form').addEventListener('submit', function(
     var nom = document.getElementById('nom').value;
     var motDePasse = document.getElementById('motdepasse').value;
 
-    fetch('http://localhost:3000/api/register', {
+    fetch('http://192.168.65.77:3000/api/register', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

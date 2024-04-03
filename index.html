@@ -11,7 +11,7 @@
         <h2>Login</h2>
         <div id="login-form">
             <input type="text" id="nom" placeholder="Nom" required value=""> <!-- Utilisez "Nom" pour le champ de nom -->
-            <input type="password" id="mot-de-passe" placeholder="Mot de passe" required required value=""> <!-- Utilisez "Mot de passe" pour le champ de mot de passe -->
+            <input type="password" id="mot-de-passe" placeholder="Mot de passe" required value=""> <!-- Utilisez "Mot de passe" pour le champ de mot de passe -->
             <button id="login-button">Login</button>
             <div style="width: 10px; display: inline-block;"></div> <!-- Espace de 20 pixels -->
             <button onclick="window.location.href = 'inscription.html';">S'inscrire</button>
@@ -19,12 +19,25 @@
         
         <div id="login-success" style="display: none;">
             <h2>Login réussi !</h2>
+            <!-- Bouton de déconnexion -->
+            <button id="logout-button">Se déconnecter</button>
+            
             <!-- Ajoutez ici le contenu de la page qui sera affiché après la connexion réussie -->
-        </div>
+            <div>
+                <h3>Images cliquables</h3>
+               
+             <!-- Ajoutez autant d'images que vous le souhaitez -->
+             <div class="container" style="text-align: center;">
+                <img id="cookieImage" src="image/Icoockie.jpg" alt="Image 1" class="clickable-image" style="max-width: 300px; max-height: 200px; margin: 0 auto;">
+
+            </div>
+            </div>
+        </div>    
        
         <p id="error-message" class="error-message"></p>
     </div>
-    
+       
+
     <script src="script.js"></script> <!-- Inclure le fichier JavaScript -->
 </body>
 </html>
