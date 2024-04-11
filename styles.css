@@ -6,13 +6,19 @@
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+    background-image: url('image/1325451.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin: auto; /* Pour supprimer les marges par défaut du corps */
+    padding: 63px; /* Pour supprimer les rembourrages par défaut du corps */
 }
+
 
 .login-container {
     width: 300px;
-    margin: 100px auto;
-    background-color: #fff;
+    margin: 200px auto;
+    background-color: whitesmoke;
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
@@ -24,12 +30,18 @@ h2 {
     color: #333;
 }
 
+h3 {
+    text-align: center;
+    margin-bottom: 100px;
+    color: #333;
+}
+
 input[type="text"],
 input[type="password"] {
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
-    border: 1px solid #ccc;
+    border: 1px solid #ffffff;
     border-radius: 3px;
 }
 
@@ -57,16 +69,17 @@ button:hover {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* Hauteur égale à 100% de la hauteur de la fenêtre */
+    height: auto;
 }
 
+
 .clickable-image {
-    max-width: 300px; /* Limite la largeur de l'image à 300 pixels */
-    max-height: 200px; /* Limite la hauteur de l'image à 200 pixels */
-    width: auto; /* La largeur de l'image s'ajuste automatiquement pour préserver les proportions */
-    height: auto; /* La hauteur de l'image s'ajuste automatiquement pour préserver les proportions */
-    display: block; /* Assurez-vous que l'image est affichée en tant que bloc pour éviter des problèmes de mise en page */
-    margin: 0 auto; /* Centrer l'image horizontalement */
+    max-width: 300px;
+    max-height: 200px;
+    width: auto;
+    height: auto;
+    display: block;
+    margin: 0 auto;
 }
 
 #score-increment-button {

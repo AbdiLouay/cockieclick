@@ -1,145 +1,173 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const mysql = require('mysql');
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
-const jwt = require('jsonwebtoken'); 
-
-const path = require('path');
-const app = express();
-const port = 3000;
-
-app.use(bodyParser.json());
-app.use(cookieParser());
-app.use(cors());
-
-app.use(express.static(path.join(__dirname, 'front')));
-
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    res.setHeader('Access-Control-Allow-Credentials', 'true'); // Autorise les requêtes avec des cookies
-    next();
-});
-
-const connection = mysql.createConnection({
-    host: '192.168.65.77',
-    user: 'api',
-    password: 'api',
-    database: 'cookieclic'
-});
-
-connection.connect((err) => {
-    if (err) {
-        console.error('Erreur de connexion à la base de données :', err);
-        return;
-    }
-    console.log('Connexion à la base de données réussie');
-});
-
-var test = 1;
-function authenticateToken(req, res, next) {
-
-    //const token = req.cookies.token;
-    const token = req.body['token'];
-    
-    // Log pour vérifier si le token est correctement extrait des cookies
-    console.log('Token extrait du body de la requête :', token);
-
-    if (!token) {
-        console.log('Token manquant dans les cookies');
-        return res.status(401).json({ error: 'Token manquant, veuillez vous connecter.' });
-    }
-
-    jwt.verify(token, 'votre_clé_secrète', (err, decodedToken) => {
-        if (err) {
-            console.log('Erreur lors de la vérification du token :', err);
-            return res.status(403).json({ error: 'Token invalide.' });
+function getTokenFromCookies() {
+    const cookies = document.cookie.split(';');
+    for (const cookie of cookies) {
+        const [name, value] = cookie.trim().split('=');
+        if (name === 'token') {
+            return value;
         }
-        req.user = decodedToken;
-        next();
+    }
+    return null;
+}
+
+
+const token = getTokenFromCookies();
+
+
+function initialize() {
+    // Fonction pour récupérer le token depuis les cookies ou le stockage local
+    function getToken() {
+        const tokenFromCookies = getTokenFromCookies();
+        if (tokenFromCookies) {
+            return tokenFromCookies;
+        }
+        return localStorage.getItem('token');
+    }
+
+    // Fonction pour enregistrer le token dans les cookies et le stockage local
+    function saveToken(token) {
+        document.cookie = `token=${token}; path=/`;
+        localStorage.setItem('token', token);
+    }
+
+    // Fonction pour afficher le contenu après la connexion réussie
+    function showLoggedInContent() {
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('login-success').style.display = 'block';
+    }
+
+    // Fonction pour effectuer une requête AJAX avec le token JWT
+    function fetchWithToken(url, options) {
+        const token = getToken();
+        if (!token) {
+            throw new Error('Token manquant');
+        }
+        options.headers = {
+            ...options.headers,
+            'Authorization': 'Bearer ' + token
+        };
+    
+        // Ajouter le cookie contenant le token aux en-têtes
+        options.headers['Cookie'] = `token=${token}`;
+    
+        return fetch(url, options);
+    }   
+    
+    // Vérifier si un token est présent dans les cookies ou le stockage local
+    if (token) {
+        // Si un token est présent, afficher le contenu de la page après la connexion réussie
+        showLoggedInContent();
+    } else {
+        // Sinon, afficher le formulaire de connexion
+        document.getElementById('login-form').style.display = 'block';
+        document.getElementById('login-success').style.display = 'none';
+    }
+
+    // Gestionnaire d'événements pour le bouton de connexion
+    document.getElementById('login-button').addEventListener('click', function() {
+        var nom = document.getElementById('nom').value;
+        var motDePasse = document.getElementById('mot-de-passe').value;
+
+        // Effectuer la requête de connexion
+        fetch('http://192.168.65.77:3000/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                nom: nom,
+                motDePasse: motDePasse
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('La requête a échoué : ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Enregistrer le token dans les cookies et le stockage local
+            saveToken(data.token);
+            // Afficher le contenu de la page après la connexion réussie
+            showLoggedInContent();
+        })
+        .catch(error => {
+            console.error('Erreur lors de la connexion :', error);
+        });
+    });
+
+    // Gestionnaire d'événements pour le bouton de déconnexion
+    document.getElementById("logout-button").addEventListener("click", function() {
+        // Supprimer le token des cookies et du stockage local
+        document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        localStorage.removeItem('token');
+        // Recharger la page
+        window.location.reload();
+    });
+
+    // Gestionnaire d'événement pour l'image cliquable spécifique (cookieImage)
+    document.getElementById('cookieImage').addEventListener('click', function(){
+        var cookie = document.cookie;
+        // Effectuer une requête AJAX pour incrémenter le score
+        fetchWithToken('http://192.168.65.77:3000/api/increment-score', {
+            method: 'POST',
+            //credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                Cookie: cookie
+            },
+            body: JSON.stringify({ increment: 1, token: getTokenFromCookies() })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('La requête a échoué : ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+        })
+        .catch(error => {
+            console.error('Erreur lors de la mise à jour du score :', error);
+        });
     });
 }
 
-app.post('/api/login', (req, res) => {
-    const { nom, motDePasse } = req.body;
+// Fonction pour récupérer le score actuel depuis le serveur
+function getScore() {
+    // Récupérer le token depuis les cookies
+    const token = getTokenFromCookies();
 
-    const sql = `SELECT * FROM User WHERE nom = ? AND mot_de_passe = ?`;
-    connection.query(sql, [nom, motDePasse], (err, results) => {
-        if (err) {
-            console.error('Erreur lors de l\'exécution de la requête SQL :', err);
-            return res.status(500).json({ error: 'Erreur interne du serveur' });
-        }
+    // Vérifier si le token est disponible
+    if (!token) {
+        console.error('Token manquant pour récupérer le score.');
+        return;
+    }
 
-        if (results.length > 0) {
-            const user = { nom };
-            const token = jwt.sign(user, 'votre_clé_secrète', { expiresIn: '7d' });
-            // Définir le cookie dans les en-têtes de la réponse
-            res.setHeader('Set-Cookie', `token=${token}; Path=/; HttpOnly`);
-            res.status(200).json({ message: 'Connexion réussie!', token: token });
-        } else {
-            res.status(401).json({ error: 'Nom d\'utilisateur ou mot de passe invalide.' });
+    // Créer l'URL de la requête pour récupérer le score
+    const scoreURL = 'http://192.168.65.77:3000/api/get-score';
+
+    // Effectuer une requête GET pour récupérer le score actuel avec le token dans l'en-tête
+    fetch(scoreURL, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`
         }
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error('La requête a échoué : ' + response.statusText);
+        }
+        return response.json();
+    }).then(data => {
+        // Mettre à jour l'affichage du score sur votre page
+        document.getElementById('score').innerText = 'Score : ' + data.score;
+    }).catch(error => {
+        console.error('Erreur lors de la récupération du score :', error);
     });
-});
+}
 
-// Route d'inscription
-app.post('/api/register', (req, res) => {
-    const { nom, motDePasse } = req.body;
-
-    // Vérification si le nom d'utilisateur est déjà utilisé
-    const checkUserSql = `SELECT * FROM User WHERE nom = ?`;
-    connection.query(checkUserSql, [nom], (err, results) => {
-        if (err) {
-            console.error('Erreur lors de la vérification du nom d\'utilisateur :', err);
-            return res.status(500).json({ error: 'Erreur interne du serveur' });
-        }
-
-        if (results.length > 0) {
-            return res.status(400).json({ error: 'Ce nom d\'utilisateur est déjà pris.' });
-        }
-
-        // Insertion du nouvel utilisateur avec score par défaut à 0
-        const insertUserSql = `INSERT INTO User (nom, mot_de_passe, score) VALUES (?, ?, 0)`;
-        connection.query(insertUserSql, [nom, motDePasse], (err, insertResults) => {
-            if (err) {
-                console.error('Erreur lors de l\'insertion de l\'utilisateur :', err);
-                return res.status(500).json({ error: 'Erreur interne du serveur' });
-            }
-
-            // Génération du token pour le nouvel utilisateur
-            const user = { nom };
-            const token = jwt.sign(user, 'votre_clé_secrète', { expiresIn: '7d' });
-
-            // Stockage du token dans la base de données
-            const updateTokenSql = `UPDATE User SET token = ? WHERE nom = ?`;
-            connection.query(updateTokenSql, [token, nom], (err, updateResults) => {
-                if (err) {
-                    console.error('Erreur lors de l\'enregistrement du token dans la base de données :', err);
-                    return res.status(500).json({ error: 'Erreur interne du serveur' });
-                }
-                res.status(200).json({ message: 'Inscription réussie !' });
-            });
-        });
-    });
-});
+// Appel de la fonction pour récupérer le score actuel toutes les secondes
+setInterval(getScore, 1000); // Rafraîchit le score toutes les 1000 millisecondes (1 seconde)
 
 
-app.post('/api/increment-score', authenticateToken, (req, res) => {
-    const { nom } = req.user;
-    
-    const incrementScoreSql = `UPDATE User SET score = score + 1 WHERE nom = ?`;
-    connection.query(incrementScoreSql, [nom], (err, result) => {
-        if (err) {
-            console.error('Erreur lors de la mise à jour du score :', err);
-            return res.status(500).json({ error: 'Erreur interne du serveur' });
-        }
-        res.status(200).json({ message: 'Score augmenté avec succès' });
-    });
-});
 
-
-app.listen(port, () => {
-    console.log(`Le serveur est en cours d'exécution sur http://:${port}`);
-});
+// Appel de la fonction initialize immédiatement après sa définition
+initialize();

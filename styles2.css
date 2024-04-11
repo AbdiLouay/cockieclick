@@ -22,9 +22,12 @@ h3 {
 }
 body {
     font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f0f0f0;
+    background-image: url('image/13.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin: auto; /* Pour supprimer les marges par défaut du corps */
+    padding: 200px; /* Pour supprimer les rembourrages par défaut du corps */
 }
 .container {
     width: 50%;

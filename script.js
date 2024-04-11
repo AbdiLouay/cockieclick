@@ -10,33 +10,6 @@ function getTokenFromCookies() {
 }
 
 const token = getTokenFromCookies();
-/*
-fetch('/api/private', {
-    method: 'GET',
-    headers: {
-        'Authorization': `Bearer ${token}`
-    }
-})
-.then(response => response.json())
-.then(data => console.log(data))
-.catch(error => console.error('Erreur :', error));
-
-async function getStuff() { 
-    try {
-        // Correction : Remplacement de fetchStuff par fetch
-        const response = await fetch('/api/private', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        const stuff = await response.json();
-        return process(stuff);
-    } catch (err) { 
-        console.error(err);
-    }
-}
-*/
 
 function initialize() {
     // Fonction pour récupérer le token depuis les cookies ou le stockage local
@@ -78,20 +51,7 @@ function initialize() {
         return fetch(url, options);
     }
 
-    /*
-    // Appel de la fonction getStuff
-    fetchStuff()
-    .then(stuff => {
-        // Traitement des données récupérées avec fetchStuff()
-        return process(stuff);
-      })
-      .then(processedData => {
-        // Continuer le traitement avec les données traitées
-      })
-      .catch(error => {
-        console.error(error);
-      });
-*/
+
     // Vérifier si un token est présent dans les cookies ou le stockage local
     if (token) {
         // Si un token est présent, afficher le contenu de la page après la connexion réussie
